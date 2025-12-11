@@ -18,3 +18,4 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 	renderPage(w, "index.html", data)
 }
+
