@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	initTemp "groupie/pages"
 	"groupie/router"
-	"fmt"
 	"net/http"
 )
 
