@@ -1,78 +1,100 @@
 package structure
 
-import (
-	"go/types"
-)
-
-type Pokemon struct {
-	PokedexID   int          `json:"pokedex_id"`
-	Generation  int          `json:"generation"`
-	Category    string       `json:"category"`
-	Name        string       `json:"name"`
-	Sprite      string       `json:"sprite"`
-	Types       []types.Info `json:"types"`
-	Talents     []Talent     `json:"talents"`
-	Stats       Stats        `json:"stats"`
-	Resistances []Resistance `json:"resistances"`
-	Evolution   Evolution    `json:"evolution"`
-	Weight      string       `json:"weight"`
-	Height      string       `json:"height"`
-	Egggroup    []string     `json:"egg_group"`
-	Sexe        Sexe         `json:"sexe"`
-	Catchrate   int          `json:"catch_rate"`
-	Level100    int          `json:"level_100"`
-	Formes      []string     `json:"formes"`
+type ApiData struct {
+	PokedexId   int           `json:"pokedex_id"`
+	Generation  int           `json:"generation"`
+	Categorie   string        `json:"categorie"`
+	Name        Name          `json:"name"`
+	Sprites     Sprites       `json:"sprites"`
+	Types       []Types       `json:"types"`
+	Talents     []Talents     `json:"talents"`
+	Stats       Stats         `json:"stats"`
+	Resistances []Resistances `json:"resistances"`
+	Evolution   Evolution     `json:"evolution"`
+	Height      string        `json:"height"`
+	Weight      string        `json:"weight"`
+	EggGroups   []string      `json:"egg_groups"`
+	Sexe        Sexe          `json:"sexe"`
+	CatchRate   int           `json:"catch_rate"`
+	Level100    int           `json:"level_100"`
+	Formes      []Formes      `json:"formes"`
 }
 
-type LacalizedName struct {
+type Name struct {
 	Fr string `json:"fr"`
 	En string `json:"en"`
 	Jp string `json:"jp"`
 }
 
 type Sprites struct {
-	Regular string  `json:"regular"`
-	Shiny   string  `json:"shiny"`
-	Gmax    *string `json:"gmax"`
+	Regular string `json:"regular"`
+	Shiny   string `json:"shiny"`
+	Gmax    Gmax   `json:"gmax"`
 }
 
-type Typeinfo struct {
+type Gmax struct {
+	Regular string `json:"regular"`
+	Shiny   string `json:"shiny"`
+}
+
+type Types struct {
 	Name  string `json:"name"`
 	Image string `json:"image"`
 }
 
-type Talent struct {
+type Talents struct {
 	Name string `json:"name"`
-	TC   bool   `json:"TC"`
+	Tc   bool   `json:"tc"`
 }
 
 type Stats struct {
-	HP        int `json:"HP"`
-	Attack    int `json:"Attack"`
-	Defense   int `json:"Defense"`
-	SpAttack  int `json:"SpAttack"`
-	SpDefense int `json:"SpDefense"`
-	Speed     int `json:"Speed"`
+	Hp     int `json:"hp"`
+	Atk    int `json:"atk"`
+	Def    int `json:"def"`
+	SpeAtk int `json:"spe_atk"`
+	SpeDef int `json:"spe_def"`
+	Vit    int `json:"vit"`
 }
 
-type Resistance struct {
+type Resistances struct {
 	Name       string  `json:"name"`
 	Multiplier float64 `json:"multiplier"`
 }
 
 type Evolution struct {
-	Pre  []Evolutionlink `json:"pre"`
-	Next []Evolutionlink `json:"next"`
-	Mega []Evolutionlink `json:"mega"`
+	Pre  []Pre  `json:"pre"`
+	Next []Next `json:"next"`
+	Mega []Mega `json:"mega"`
 }
 
-type Evolutionlink struct {
-	PokedexID int    `json:"pokedex_id"`
+type Pre struct {
+	PokedexId int    `json:"pokedex_id"`
 	Name      string `json:"name"`
 	Condition string `json:"condition"`
 }
 
+type Next struct {
+	PokedexId int    `json:"pokedex_id"`
+	Name      string `json:"name"`
+	Condition string `json:"condition"`
+}
+
+type Mega struct {
+	Orbe        string      `json:"orbe"`
+	SpritesMega SpritesMega `json:"sprites"`
+}
+
+type SpritesMega struct {
+	Regular string `json:"regular"`
+	Shiny   string `json:"shiny"`
+}
+
 type Sexe struct {
-	Male   int `json:"male"`
-	Female int `json:"female"`
+	Male   float64 `json:"male"`
+	Female float64 `json:"female"`
+}
+
+type Formes struct {
+	Region string `json:"region"`
+	Name   Name   `json:"name"`
 }
