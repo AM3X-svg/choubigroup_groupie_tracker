@@ -6,6 +6,7 @@ import (
 	"groupie/pages"
 	Struct "groupie/struct"
 	"io"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -13,21 +14,31 @@ import (
 func renderPage(w http.ResponseWriter, filename string, data any) {
 	err := pages.Temp.ExecuteTemplate(w, filename, data)
 	if err != nil {
-		// Meilleure pratique : logguer l'erreur côté serveur
 		fmt.Println("Erreur rendu template :", err)
 		http.Error(w, "Erreur rendu template.", http.StatusInternalServerError)
 	}
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
+	pokedex := GetPokedex()
+
+	var randomPokemon Struct.ApiData
+
+	if len(pokedex) > 0 {
+		randomIndex := rand.Intn(len(pokedex))
+		randomPokemon = pokedex[randomIndex]
+	} else {
+		http.Error(w, "Impossible de charger les données du Pokédex.", http.StatusInternalServerError)
+		return
+	}
+
 	data := map[string]interface{}{
-		// Maintenant GetPokedex() retourne bien le slice de Pokémon
-		"Pokedex": GetPokedex(),
+		"RandomPokemon": randomPokemon,
+		"Pokedex":       pokedex,
 	}
 	renderPage(w, "index.html", data)
 }
 
-// GetPokedex retourne un slice de Struct.ApiData, représentant la liste des Pokémon.
 func GetPokedex() []Struct.ApiData {
 	urlApi := "https://tyradex.app/api/v1/pokemon"
 
@@ -45,7 +56,6 @@ func GetPokedex() []Struct.ApiData {
 	}
 	defer res.Body.Close()
 
-	// Vérifier le statut de la réponse avant de lire le corps
 	if res.StatusCode != http.StatusOK {
 		fmt.Println("Erreur statut HTTP :", res.StatusCode)
 		return nil
@@ -57,22 +67,11 @@ func GetPokedex() []Struct.ApiData {
 		return nil
 	}
 
-	// ⭐️ CORRECTION MAJEURE : On désérialise dans un SLICE de ApiData.
 	var pokedex []Struct.ApiData
 	if err := json.Unmarshal(body, &pokedex); err != nil {
 		fmt.Println("Erreur décodage JSON :", err)
-		// Optionnel : Afficher le corps pour aider au débogage du JSON
-		// fmt.Println("Corps de la réponse :", string(body))
 		return nil
 	}
 
-	if len(pokedex) > 0 {
-		fmt.Println("✅ Succès ! %d Pokémon décodés. Le premier est : %s\n", len(pokedex), pokedex[0].Name.Fr)
-	} else {
-		fmt.Println("⚠️ Avertissement : Aucune donnée de Pokémon n'a été décodée (slice vide).")
-	}
-
-	// ⭐️ DEUXIÈME CORRECTION : On retourne le slice complet.
-	// La ligne `return data.PokedexId` n'est plus nécessaire/pertinente.
 	return pokedex
 }
