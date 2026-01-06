@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
+    <input type="checkbox" id="toggle-search" class="search-state-checkbox" style="display: none;">
+
     <header class="header">
         <a href="/index">Accueil</a>
         <a href="/collection">Collection</a>
@@ -16,42 +18,67 @@
         <a href="#" class="header-icon lucide-heart-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
         </a>
-        <a href="#" class="header-icon lucide-search-icon">
+        
+        <label for="toggle-search" class="header-icon lucide-search-icon" style="cursor: pointer;">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-        </a>
+        </label>
     </header>
+
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-container">
+            <div class="search-top-bar">
+                <form action="/" method="get">
+                    <input type="text" name="search" placeholder="Nom du Pokémon" value="{{.Query}}">
+                    <button type="submit">Rechercher</button>
+                </form>
+                <a href="/" class="clear-search-btn">Supprimer la recherche</a>
+            </div>
+
+            <div class="search-results-box">
+                {{if .Query}}
+                    <p>Résultats pour "{{.Query}}" :</p>
+                {{end}}
+            </div>
+
+            <hr>
+
+            <div class="result-list-container">
+                {{range .Pokedex}}
+                    <div class="search-sprites">
+                        <img src="{{.Sprites.Regular}}">
+                        <p>{{.Name.Fr}}</p>
+                    </div>
+                {{else}}
+                    {{if .Query}}
+                        <p class="no-result-msg">Aucun Pokémon ne correspond à votre recherche.</p>
+                    {{end}}
+                {{end}}
+            </div>
+        </div>
+    </div>
 
     <main class="main">
         <div class="hero-container">
-            
             <input type="radio" name="screen-selector" id="screen-1" checked>
             <input type="radio" name="screen-selector" id="screen-2">
 
             <div id="accueil-screen" class="screen">
                 <div class="pokemon-display-area">
                     {{with .RandomPokemon}}
-                    <img 
-                        src="{{.Sprites.Regular}}" 
-                        alt="Image de {{.Name.Fr}}" 
-                        class="random-pokemon-img"
-                    >
+                    <img src="{{.Sprites.Regular}}" alt="Image de {{.Name.Fr}}" class="random-pokemon-img">
                     <p class="random-pokemon-name">{{.Name.Jp}}<br>{{.Name.Fr}} </p>
                     {{end}}
-                    
-                    <a href="/" class="new-pokemon-btn">
-                        Random Pokémon
-                    </a>
+                    <a href="/" class="new-pokemon-btn">Random Pokémon</a>
                 </div>
 
                 <div class="txt">
                     <p>Bienvenue dans le Pokédex interactif ! <br>
                         Ici, tu vas pouvoir explorer l’univers incroyable des Pokémon grâce à l’API Tyradex. <br>
-                        Découvre les fiches détaillées de chaque Pokémon, leurs formes régionales, et parcoure les différentes générations pour retrouver tous tes Pokémon préférés.</p>
+                        Découvre les fiches détaillées de chaque Pokémon, leurs formes régionales, et parcoure les différentes générations.</p>
                 </div>
             </div>
             
             <div id="univers-screen" class="screen">
-                
                 <div class="univers-card main-card">
                     <div class="card-controls">
                         <label for="screen-1" class="close-icon lucide-x-icon">
@@ -62,12 +89,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
                         </span>
                     </div>
-                    
                     <p class="card-content">L'univers que nous avons choisi est celui de Pokémon, un monde riche et iconique qui mélange créatures fantastiques, aventure, stratégie et collection. Depuis plus de 25 ans, Pokémon s'est imposé comme un univers complet, comprenant jeux vidéo, séries animées, films, produits dérivés et, surtout, un jeu de cartes à collectionner devenu mondialement populaire. Cet univers est particulièrement intéressant à exploiter car il repose sur une identité visuelle forte, des créatures variées et reconnaissables, ainsi qu'un système de classification clair (types, séries, raretés, extensions...). Son esthétique colorée et sa structure très codifiée permettent de créer une expérience immersive, cohérente et ludique, qu'il s'agisse de visualiser des cartes, d'explorer des decks ou de parcourir différentes extensions du TCG.</p>
                 </div>
 
                 <div class="side-cards-wrapper">
-                    
                     <div class="univers-card side-card-top">
                         <p>Pour enrichir ce projet avec des données réelles et structurées, j'ai exploité l'API Pokémon TCG. Cette API donne accès à un ensemble complet d'informations provenant du jeu de cartes officiel : cartes, extensions, types, raretés, règles, images, etc.</p>
                     </div>
@@ -75,28 +100,23 @@
                     <div class="univers-card side-card-bottom">
                         <img src="/static/images/logo.png" class="doc-icon">
                         <div class="doc-info">
-                            <a href="https://tyradex.vercel.app/docs" target="_blank">Documentaion officiel</a>
+                            <a href="https://tyradex.vercel.app/docs" target="_blank">Documentation officielle</a>
                         </div>
                         <span class="time-stamp">9:41 AM</span>
                     </div>
 
                     <div class="univers-card side-card-bottom-description">
-                        <p>Elle détaille l'ensemble des fonctionnalités, les paramètres, les formats de réponse et les bonnes pratiques d'utilisation.</p>
+                        <p>Elle détaille l'ensemble des fonctionnalités, les paramètres, les formats de réponse.</p>
                     </div>
                 </div>
             </div>
 
             <div class="univers-slider">
-                <label for="screen-1" class="slider-dot active"></label>
+                <label for="screen-1" class="slider-dot"></label>
                 <label for="screen-2" class="slider-dot"></label>
                 <label for="screen-3" class="slider-dot"></label>
                 <label for="screen-4" class="slider-dot"></label>
-                <label for="screen-5" class="slider-dot"></label>
-                <label for="screen-6" class="slider-dot"></label>
-                <label for="screen-7" class="slider-dot"></label>
-                <label for="screen-8" class="slider-dot"></label>
             </div>
-
         </div>
     </main>
 </body>

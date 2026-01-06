@@ -8,6 +8,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -21,21 +22,32 @@ func renderPage(w http.ResponseWriter, filename string, data any) {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	pokedex := GetPokedex()
+	query := r.FormValue("search")
 
+	var results []Struct.ApiData
 	var randomPokemon Struct.ApiData
 
 	if len(pokedex) > 0 {
 		randomIndex := rand.Intn(len(pokedex))
 		randomPokemon = pokedex[randomIndex]
+	}
+
+	if query != "" {
+		for _, p := range pokedex {
+			if strings.Contains(strings.ToLower(p.Name.Fr), strings.ToLower(query)) {
+				results = append(results, p)
+			}
+		}
 	} else {
-		http.Error(w, "Impossible de charger les données du Pokédex.", http.StatusInternalServerError)
-		return
+		results = nil
 	}
 
 	data := map[string]interface{}{
 		"RandomPokemon": randomPokemon,
-		"Pokedex":       pokedex,
+		"Pokedex":       results, 
+		"Query":         query,
 	}
+
 	renderPage(w, "index.html", data)
 }
 
@@ -74,4 +86,37 @@ func GetPokedex() []Struct.ApiData {
 	}
 
 	return pokedex
+}
+
+func SearchSystem(query string) []Struct.ApiData {
+	// 1. L'URL de base (On récupère tout car l'API n'a pas de endpoint /Search)
+	urlApi := "https://tyradex.app/api/v1/pokemon"
+
+	req, err := http.NewRequest(http.MethodGet, urlApi, nil)
+	if err != nil {
+		return nil
+	}
+
+	client := http.Client{Timeout: 5 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil
+	}
+	defer res.Body.Close()
+
+	body, _ := io.ReadAll(res.Body)
+
+	var allPokemon []Struct.ApiData
+	json.Unmarshal(body, &allPokemon)
+
+	// 2. Logique de recherche : on filtre manuellement
+	var resultats []Struct.ApiData
+	for _, p := range allPokemon {
+		// On compare le nom français du Pokémon avec la recherche (query)
+		if strings.Contains(strings.ToLower(p.Name.Fr), strings.ToLower(query)) {
+			resultats = append(resultats, p)
+		}
+	}
+
+	return resultats
 }
