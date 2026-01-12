@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokédex Interactif</title>
+    <title>Pokédex - Collection</title>
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
@@ -23,6 +23,43 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
         </label>
     </header>
+
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-container">
+            <div class="search-top-bar">
+                <form action="/collection" method="get">
+                    <input type="text" name="search" placeholder="Nom du Pokémon">
+                    <button type="submit">Rechercher</button>
+                </form>
+                <a href="/collection" class="clear-search-btn">Réinitialiser</a>
+            </div>
+
+            <hr>
+
+            <div class="result-list-container">
+                {{range .}}
+                    <div class="search-sprites">
+                        <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}" width="100">
+                        <p>{{.Name.Fr}}</p>
+                        <small>n°{{.PokedexId}}</small>
+                    </div>
+                {{else}}
+                    <p class="no-result-msg">Aucun Pokémon trouvé.</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <section class="collection-grid">
+            {{range .}}
+                <div class="pokemon-card">
+                    <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}">
+                    <h3>{{.Name.Fr}}</h3>
+                </div>
+            {{end}}
+        </section>
+    </main>
     
 </body>
 </html>

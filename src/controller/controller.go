@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"groupie/pages"
 	Struct "groupie/struct"
+	"html/template"
 	"io"
 	"math/rand"
 	"net/http"
@@ -44,11 +45,84 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	data := map[string]interface{}{
 		"RandomPokemon": randomPokemon,
-		"Pokedex":       results, 
+		"Pokedex":       results,
 		"Query":         query,
 	}
 
 	renderPage(w, "index.html", data)
+}
+
+func CollectionHandler(w http.ResponseWriter, r *http.Request) {
+	// 1. Récupérer tout le pokedex
+	allPokedex := GetPokedex()
+
+	// 2. Récupérer la saisie de l'utilisateur (le "name" de ton <input>)
+	query := r.FormValue("search")
+
+	var data []Struct.ApiData
+
+	// 3. Logique de filtrage
+	if query != "" {
+		for _, p := range allPokedex {
+			// Filtrer par nom (en minuscule pour ne pas être sensible à la casse)
+			if strings.Contains(strings.ToLower(p.Name.Fr), strings.ToLower(query)) {
+				data = append(data, p)
+			}
+		}
+	} else {
+		// Si pas de recherche, on affiche tout
+		data = allPokedex
+	}
+
+	// 4. Rendu de la page
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/collection.html")
+	if err != nil {
+		http.Error(w, "Erreur lors du chargement du template", http.StatusInternalServerError)
+		return
+	}
+
+	// Envoyer les données filtrées
+	tmpl.Execute(w, data)
+}
+
+func RessourcesHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/ressources.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func CategorieHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/categorie.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func AProposHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/aPropos.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func GetPokedex() []Struct.ApiData {
