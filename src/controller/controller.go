@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"groupie/pages"
 	Struct "groupie/struct"
+	"html/template"
 	"io"
 	"math/rand"
 	"net/http"
@@ -44,11 +45,78 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	data := map[string]interface{}{
 		"RandomPokemon": randomPokemon,
-		"Pokedex":       results, 
+		"Pokedex":       results,
 		"Query":         query,
 	}
 
 	renderPage(w, "index.html", data)
+}
+
+func CollectionHandler(w http.ResponseWriter, r *http.Request) {
+
+	allPokedex := GetPokedex()
+
+	query := r.FormValue("search")
+
+	var data []Struct.ApiData
+
+	if query != "" {
+		for _, p := range allPokedex {
+			if strings.Contains(strings.ToLower(p.Name.Fr), strings.ToLower(query)) {
+				data = append(data, p)
+			}
+		}
+	} else {
+		data = allPokedex
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/collection.html")
+	if err != nil {
+		http.Error(w, "Erreur lors du chargement du template", http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.Execute(w, data)
+}
+
+func RessourcesHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/ressources.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func CategorieHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/categorie.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func AProposHandler(w http.ResponseWriter, r *http.Request) {
+	data := GetPokedex()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	tmpl, err := template.ParseFiles("pages/aPropos.html")
+	if err != nil {
+		http.Error(w, "template parse error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func GetPokedex() []Struct.ApiData {
