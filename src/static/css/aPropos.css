@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
+
+body {
+    background: #e0e0e0;
+    min-height: 100vh;
+    padding-top: 150px;
+    color: #222;
+    line-height: 1.6;
+}
+
+/* --- HEADER ORIGINEL (PROTECTION DU STYLE) --- */
+header {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px); /* Ajouté pour le style */
+    border-radius: 40px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+
+    /* On s'assure que le header est au premier plan absolu */
+    z-index: 10000;
+    /* SURTOUT PAS d'overflow: hidden ici sinon les menus seront coupés */
+}
+
+header a {
+    text-decoration: none;
+    padding: 0 15px;
+    color: black;
+}
+
+.header svg {
+    stroke: black;
+}
+
+.header-icon svg {
+    stroke: black;
+    cursor: pointer;
+}
+
+/* --- CONTENEUR --- */
+.journal-container { max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
+
+.intro-section { text-align: center; margin-bottom: 60px; }
+.intro-section h1 { font-size: 3rem; margin-bottom: 10px; }
+.subtitle { font-size: 1.2rem; opacity: 0.7; }
+
+/* --- CARTES GLASSMORPHISM --- */
+.glass {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 35px;
+    padding: 35px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+}
+
+h2 { color: #ee1515; margin-bottom: 20px; font-size: 1.6rem; }
+
+.btn-link {
+    display: inline-block;
+    padding: 12px 25px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-link:hover { background: #ee1515; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(238, 21, 21, 0.3); }
+
+/* --- TEAM QUOTES --- */
+.team-quotes-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.quote-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.profile { margin-bottom: 20px; border-bottom: 2px solid rgba(238, 21, 21, 0.2); padding-bottom: 10px; }
+.profile h3 { font-size: 1.8rem; color: #000; }
+.role { font-size: 0.9rem; color: #ee1515; font-weight: 700; text-transform: uppercase; }
+
+.quote-box ul { margin: 15px 0; padding-left: 20px; }
+.quote-box li { margin-bottom: 8px; font-size: 0.95rem; }
+
+.impact { margin-top: auto; padding-top: 20px; font-style: italic; color: #555; font-size: 0.9rem; border-top: 1px solid rgba(0,0,0,0.05); }
+
+/* --- ROADMAP & DIFFICULTÉS --- */
+.task-list { list-style: none; }
+.task-list li { padding: 12px 0 12px 35px; position: relative; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.task-list li.done::before { content: "✓"; position: absolute; left: 0; color: #2ecc71; font-weight: 900; font-size: 1.2rem; }
+.task-list li.process::before { content: "→"; position: absolute; left: 0; color: #f1c40f; font-weight: 900; }
+
+.difficulty-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.diff-item { background: rgba(255, 255, 255, 0.2); padding: 20px; border-radius: 20px; }
+.diff-item h4 { margin-bottom: 10px; font-size: 1.1rem; }
+
+@media (max-width: 900px) {
+    .team-quotes-large, .difficulty-grid { grid-template-columns: 1fr; }
+}
