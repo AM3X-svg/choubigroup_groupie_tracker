@@ -6,99 +6,100 @@
     <title>Pokédex - Collection</title>
     <link rel="stylesheet" href="/static/css/collection.css">
 </head>
+
 <body>
-<input type="checkbox" id="toggle-search" class="state-checkbox" style="display: none;" {{if .Query}}checked{{end}}>
-<input type="checkbox" id="toggle-favs" class="state-checkbox" style="display: none;">
-<input type="checkbox" id="toggle-auth" class="state-checkbox" style="display: none;">
+    <input type="checkbox" id="toggle-search" class="state-checkbox" style="display: none;" {{if .Query}}checked{{end}}>
+    <input type="checkbox" id="toggle-favs" class="state-checkbox" style="display: none;">
+    <input type="checkbox" id="toggle-auth" class="state-checkbox" style="display: none;">
 
 
-<header class="header">
-    <a href="/index">Accueil</a>
-    <a href="/collection">Collection</a>
-    <a href="/ressources">Ressources</a>
-    <a href="/categorie">Catégorie</a>
-    <a href="/aPropos">A-Propos</a>
-    <label for="toggle-favs" class="header-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
-    </label>
+    <header class="header">
+        <a href="/index">Accueil</a>
+        <a href="/collection">Collection</a>
+        <a href="/ressources">Ressources</a>
+        <a href="/categorie">Catégorie</a>
+        <a href="/aPropos">A-Propos</a>
+        <label for="toggle-favs" class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
+        </label>
 
-    <label for="toggle-auth" class="header-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </label>
+        <label for="toggle-auth" class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </label>
 
-    <label for="toggle-search" class="header-icon" style="cursor: pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-    </label>
-</header>
+        <label for="toggle-search" class="header-icon" style="cursor: pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+    </header>
 
-<main class="container">
-    <div class="filter-toolbar">
-        <div class="toolbar-title">
-            <h2>Filtres</h2>
-        </div>
-
-        <div class="dropdowns-container">
-            <details class="filter-dropdown">
-                <summary>Types d'Énergie</summary>
-                <div class="dropdown-content filter-energie">
-                    <label><input type="checkbox" class="filter-checkbox" value="Feu"> Feu</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Eau"> Eau</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Plante"> Plante</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Électrik"> Électrik</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Glace"> Glace</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Combat"> Combat</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Poison"> Poison</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Sol"> Sol</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Vol"> Vol</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Psy"> Psy</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Insecte"> Insecte</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Roche"> Roche</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Spectre"> Spectre</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Dragon"> Dragon</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Ténèbres"> Ténèbres</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Acier"> Acier</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Fée"> Fée</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="Normal"> Normal</label>
-                </div>
-            </details>
-
-            <details class="filter-dropdown">
-                <summary>Générations</summary>
-                <div class="dropdown-content filter-gen">
-                    <label><input type="checkbox" class="filter-checkbox" value="1"> Gen 1</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="2"> Gen 2</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="3"> Gen 3</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="4"> Gen 4</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="5"> Gen 5</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="6"> Gen 6</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="7"> Gen 7</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="8"> Gen 8</label>
-                    <label><input type="checkbox" class="filter-checkbox" value="9"> Gen 9</label>
-                </div>
-            </details>
-        </div>
-
-        <button id="resetFilters" class="btn-reset">Réinitialiser</button>
-    </div>
-
-    <section class="collection-grid" id="pokemon-container-list">
-        {{range .Pokedex}}
-        <div class="pokemon-sprite"
-             data-gen="{{.Generation}}"
-             data-types="{{range $i, $t := .Types}}{{if $i}},{{end}}{{$t.Name}}{{end}}">
-            <span class="pokedex-id">#{{.PokedexId}}</span>
-            <div class="img-wrapper">
-                <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}" loading="lazy">
+    <main class="container">
+        <div class="filter-toolbar">
+            <div class="toolbar-title">
+                <h2>Filtres</h2>
             </div>
-            <div class="pokemon-sprites-infos">
-                <p class="pokemon-name">{{.Name.Fr}}</p>
-                <p class="pokemon-meta">Gen {{.Generation}}</p>
-            </div>
-        </div>
-        {{end}}
-    </section>
-</main>
 
-<script>{{ .CollectionJS }}</script>
+            <div class="dropdowns-container">
+                <details class="filter-dropdown">
+                    <summary>Types d'Énergie</summary>
+                    <div class="dropdown-content filter-energie">
+                        <label><input type="checkbox" class="filter-checkbox" value="Feu"> Feu</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Eau"> Eau</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Plante"> Plante</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Électrik"> Électrik</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Glace"> Glace</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Combat"> Combat</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Poison"> Poison</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Sol"> Sol</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Vol"> Vol</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Psy"> Psy</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Insecte"> Insecte</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Roche"> Roche</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Spectre"> Spectre</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Dragon"> Dragon</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Ténèbres"> Ténèbres</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Acier"> Acier</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Fée"> Fée</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="Normal"> Normal</label>
+                    </div>
+                </details>
+
+                <details class="filter-dropdown">
+                    <summary>Générations</summary>
+                    <div class="dropdown-content filter-gen">
+                        <label><input type="checkbox" class="filter-checkbox" value="1"> Gen 1</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="2"> Gen 2</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="3"> Gen 3</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="4"> Gen 4</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="5"> Gen 5</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="6"> Gen 6</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="7"> Gen 7</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="8"> Gen 8</label>
+                        <label><input type="checkbox" class="filter-checkbox" value="9"> Gen 9</label>
+                    </div>
+                </details>
+            </div>
+
+            <button id="resetFilters" class="btn-reset">Réinitialiser</button>
+        </div>
+
+        <section class="collection-grid" id="pokemon-container-list">
+            {{range .Pokedex}}
+            <div class="pokemon-sprite"
+                 data-gen="{{.Generation}}"
+                 data-types="{{range $i, $t := .Types}}{{if $i}},{{end}}{{$t.Name}}{{end}}">
+                <span class="pokedex-id">#{{.PokedexId}}</span>
+                <div class="img-wrapper">
+                    <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}" loading="lazy">
+                </div>
+                <div class="pokemon-sprites-infos">
+                    <p class="pokemon-name">{{.Name.Fr}}</p>
+                    <p class="pokemon-meta">Gen {{.Generation}}</p>
+                </div>
+            </div>
+            {{end}}
+        </section>
+    </main>
+
+    <script>{{ .CollectionJS }}</script>
 </body>
 </html>
