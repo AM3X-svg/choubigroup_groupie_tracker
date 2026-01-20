@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Coda", system-ui;
+}
+
+body {
+    overflow-x: hidden;
+    background: #e0e0e0; 
+}
+
+header {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    padding: 20px 40px; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4); 
+    border-radius: 40px; 
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5); 
+    z-index: 100;
+}
+
+header a { text-decoration: none; padding: 0 15px; color: black; }
+.header svg { stroke: black; }
+
+
+.search-overlay {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 150px;
+}
+
+.collection-grid{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    margin: 9%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.4); 
+    border-radius: 40px; 
+    border: 1px solid rgba(255, 255, 255, 0.5); 
+
+}
+
+.pokemon-sprite{
+    width: auto;
+    height: auto;
+}

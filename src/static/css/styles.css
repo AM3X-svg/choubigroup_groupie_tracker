@@ -30,8 +30,15 @@ header {
     z-index: 100;
 }
 
-header a { text-decoration: none; padding: 0 15px; color: black; }
-.header svg { stroke: black; }
+header a { 
+    text-decoration: none; 
+    padding: 0 15px; 
+    color: black; 
+}
+
+.header svg { 
+    stroke: black; 
+}
 
 
 .search-overlay {
@@ -71,7 +78,11 @@ header a { text-decoration: none; padding: 0 15px; color: black; }
     align-items: center;
 }
 
-.search-top-bar form { flex-grow: 1; display: flex; gap: 10px; }
+.search-top-bar form { 
+    flex-grow: 1; 
+    display: flex; 
+    gap: 10px; 
+}
 
 .search-top-bar input {
     flex-grow: 1;

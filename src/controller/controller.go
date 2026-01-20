@@ -53,28 +53,23 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func CollectionHandler(w http.ResponseWriter, r *http.Request) {
-	// 1. Récupérer tout le pokedex
+
 	allPokedex := GetPokedex()
 
-	// 2. Récupérer la saisie de l'utilisateur (le "name" de ton <input>)
 	query := r.FormValue("search")
 
 	var data []Struct.ApiData
 
-	// 3. Logique de filtrage
 	if query != "" {
 		for _, p := range allPokedex {
-			// Filtrer par nom (en minuscule pour ne pas être sensible à la casse)
 			if strings.Contains(strings.ToLower(p.Name.Fr), strings.ToLower(query)) {
 				data = append(data, p)
 			}
 		}
 	} else {
-		// Si pas de recherche, on affiche tout
 		data = allPokedex
 	}
 
-	// 4. Rendu de la page
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl, err := template.ParseFiles("pages/collection.html")
 	if err != nil {
@@ -82,7 +77,6 @@ func CollectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Envoyer les données filtrées
 	tmpl.Execute(w, data)
 }
 

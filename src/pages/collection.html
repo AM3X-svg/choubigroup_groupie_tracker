@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex - Collection</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/collection.css">
 </head>
 <body>
     <input type="checkbox" id="toggle-search" class="search-state-checkbox" style="display: none;">
@@ -53,9 +53,13 @@
     <main>
         <section class="collection-grid">
             {{range .}}
-                <div class="pokemon-card">
+                <div class="pokemon-sprite">
                     <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}">
-                    <h3>{{.Name.Fr}}</h3>
+                    <div class="pokemon-sprites-infos">
+                        <p>nom : {{.Name.Fr}} {{.Name.Jp}}</p>
+                        <p>génération : {{.Generation}}</p>
+                        <p>hp : {{.Stats.Hp}}</p>
+                    </div>
                 </div>
             {{end}}
         </section>
