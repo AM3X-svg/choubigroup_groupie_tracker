@@ -1,65 +1,186 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Coda", system-ui;
+    font-family: "Outfit", sans-serif;
 }
 
 body {
-    overflow-x: hidden;
-    background: #e0e0e0; 
+    background: #e0e0e0;
+    min-height: 100vh;
+    padding-top: 120px;
 }
 
+/* HEADER */
 header {
     position: fixed;
     top: 50px;
     left: 50%;
     transform: translateX(-50%);
     width: 80%;
-    padding: 20px 40px; 
+    padding: 20px 40px;
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.4); 
-    border-radius: 40px; 
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(15px); /* Ajouté pour le style */
+    border-radius: 40px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.5); 
-    z-index: 100;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+
+    /* On s'assure que le header est au premier plan absolu */
+    z-index: 10000;
+    /* SURTOUT PAS d'overflow: hidden ici sinon les menus seront coupés */
 }
 
-header a { text-decoration: none; padding: 0 15px; color: black; }
-.header svg { stroke: black; }
-
-
-.search-overlay {
-    width: 100%;
-    height: auto;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    display: none;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 150px;
+header a {
+    text-decoration: none;
+    padding: 0 15px;
+    color: black;
 }
 
-.collection-grid{
+.header svg {
+    stroke: black;
+}
+
+.header-icon svg {
+    stroke: black;
+    cursor: pointer;
+}
+
+/* --- Toolbar de Filtres (Horizontale) --- */
+.filter-toolbar {
+    width: 80%;
+    margin: 50px auto 30px auto;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 10px 30px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    /* Si elle est dans le flux de la page (sous le header) */
+    position: relative;
+    z-index: 9000;
+}
+
+.dropdowns-container {
+    display: flex;
+    gap: 20px;
+    flex-grow: 1;
     justify-content: center;
-    align-items: baseline;
-    margin: 9%;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.4); 
-    border-radius: 40px; 
-    border: 1px solid rgba(255, 255, 255, 0.5); 
-
 }
 
-.pokemon-sprite{
-    width: auto;
-    height: auto;
+.filter-dropdown {
+    position: relative;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    width: 180px;
 }
+
+.filter-dropdown summary {
+    padding: 10px 20px;
+    list-style: none;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Le contenu qui descend au survol/clic */
+.dropdown-content {
+    position: absolute;
+    top: calc(100% + 10px); /* Un petit espace sous le bouton */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px; /* Un peu plus large que le bouton */
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+
+    /* Indice de priorité maximale */
+    z-index: 10001;
+}
+
+.dropdown-content label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* --- Grille des Pokémon --- */
+.collection-grid {
+    width: 85%;
+    margin: 40px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    /* On force la grille à rester derrière tout le reste */
+    position: relative;
+    z-index: 1;
+}
+
+.pokemon-sprite {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 25px;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pokemon-sprite:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.img-wrapper img {
+    width: 100%;
+    max-width: 140px;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+}
+
+.pokemon-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 10px;
+    color: #222;
+}
+
+.btn-reset {
+    padding: 10px 25px;
+    border-radius: 20px;
+    border: none;
+    background: #333;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-reset:hover { background: #ee1515; }
+
+/* Scrollbar personnalisée pour les menus */
+.dropdown-content::-webkit-scrollbar { width: 5px; }
+.dropdown-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
