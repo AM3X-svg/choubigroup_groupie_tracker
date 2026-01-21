@@ -43,6 +43,7 @@ header a {
 }
 
 .header-icon svg {
+    opacity: 0%;
     stroke: black;
     cursor: pointer;
 }
