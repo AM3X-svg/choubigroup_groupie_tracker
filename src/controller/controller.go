@@ -9,11 +9,11 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
-	"net/url"
-    "strconv"
-
 )
 
 // PageData contient tout ce dont tes templates ont besoin
@@ -22,11 +22,25 @@ type PageData struct {
 	RandomPokemon Struct.ApiData
 	Query         string
 	CollectionJS  template.JS
-	Favorites     []Struct.ApiData // Ajouté pour corriger l'erreur du template index.html
+	Favorites     []Struct.ApiData
 
 	Pokemon    Struct.ApiData
-    IsFavorite bool
+	IsFavorite bool
 
+	// ====== CATÉGORIE + PAGINATION ======
+	Types        []string
+	SelectedType string
+	SelectedGen  int
+
+	Page       int
+	PerPage    int
+	TotalPages int
+	Pages      []int
+	PrevPage   int
+	NextPage   int
+	HasPrev    bool
+	HasNext    bool
+	BaseQuery  string
 }
 
 // renderPage gère l'affichage des fichiers HTML
@@ -35,7 +49,6 @@ func renderPage(w http.ResponseWriter, filename string, data any) {
 	err := pages.Temp.ExecuteTemplate(w, filename, data)
 	if err != nil {
 		fmt.Printf("Erreur rendu template %s : %v\n", filename, err)
-		// On ne fait pas http.Error ici car le Header est déjà envoyé
 		return
 	}
 }
@@ -62,33 +75,31 @@ func GetPokedex() []Struct.ApiData {
 // Home : Page d'accueil (index.html)
 func Home(w http.ResponseWriter, r *http.Request) {
 	pokedex := GetPokedex()
-	query := strings.ToLower(r.FormValue("search")) // Récupère la valeur du champ 'search'
+	query := strings.ToLower(r.FormValue("search"))
 
 	var results []Struct.ApiData
 	var randomPokemon Struct.ApiData
 
-	// 1. Logique du Pokémon Aléatoire
-	if len(pokedex) > 0 {
+	// Pokémon aléatoire (en évitant MissingNo qui est souvent index 0)
+	if len(pokedex) > 1 {
 		source := rand.NewSource(time.Now().UnixNano())
 		rng := rand.New(source)
 		randomPokemon = pokedex[rng.Intn(len(pokedex)-1)+1]
 	}
 
-	// 2. Logique de Recherche
+	// Recherche sur nom FR
 	if query != "" {
 		for _, p := range pokedex {
-			// On cherche dans le nom français
 			if strings.Contains(strings.ToLower(p.Name.Fr), query) {
 				results = append(results, p)
 			}
 		}
 	}
 
-	// 3. On envoie tout au template
 	data := PageData{
 		RandomPokemon: randomPokemon,
-		Pokedex:       results, // Les résultats de recherche
-		Query:         query,   // On renvoie la query pour l'afficher dans l'input
+		Pokedex:       results,
+		Query:         query,
 		Favorites:     []Struct.ApiData{},
 	}
 
@@ -103,9 +114,11 @@ func CollectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// EXCLUSION DU PREMIER POKEMON (Index 0)
-	// On ne garde que les pokémons du 2ème au dernier
-	pokedex := allPokedex[1:]
+	// EXCLUSION DU PREMIER POKEMON (Index 0) = MissingNo
+	pokedex := allPokedex
+	if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
+		pokedex = allPokedex[1:]
+	}
 
 	query := strings.ToLower(r.FormValue("search"))
 	var results []Struct.ApiData
@@ -129,10 +142,157 @@ func CollectionHandler(w http.ResponseWriter, r *http.Request) {
 	renderPage(w, "collection.html", data)
 }
 
-
-// CategorieHandler : Page des catégories
+// =========================
+// CATÉGORIE + PAGINATION
+// =========================
 func CategorieHandler(w http.ResponseWriter, r *http.Request) {
-	renderPage(w, "categorie.html", PageData{Pokedex: GetPokedex()})
+	allPokedex := GetPokedex()
+	if len(allPokedex) == 0 {
+		http.Error(w, "API indisponible", http.StatusServiceUnavailable)
+		return
+	}
+
+	// enlever MissingNo (#0)
+	if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
+		allPokedex = allPokedex[1:]
+	}
+
+	// params
+	selectedType := strings.TrimSpace(r.URL.Query().Get("type"))
+	genStr := strings.TrimSpace(r.URL.Query().Get("gen"))
+	selectedGen := 0
+	if genStr != "" {
+		if g, err := strconv.Atoi(genStr); err == nil {
+			selectedGen = g
+		}
+	}
+
+	page := 1
+	per := 24
+
+	if pStr := r.URL.Query().Get("page"); pStr != "" {
+		if p, err := strconv.Atoi(pStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	if perStr := r.URL.Query().Get("per"); perStr != "" {
+		if pp, err := strconv.Atoi(perStr); err == nil && pp > 0 && pp <= 100 {
+			per = pp
+		}
+	}
+
+	// filtre
+	filtered := make([]Struct.ApiData, 0)
+	for _, p := range allPokedex {
+		if selectedType != "" && !pokemonHasType(p, selectedType) {
+			continue
+		}
+		if selectedGen > 0 && p.Generation != selectedGen {
+			continue
+		}
+		filtered = append(filtered, p)
+	}
+
+	// tri par id
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].PokedexId < filtered[j].PokedexId
+	})
+
+	// pagination
+	totalPages := 1
+	if len(filtered) > 0 {
+		totalPages = (len(filtered) + per - 1) / per
+	}
+	if page > totalPages {
+		page = totalPages
+	}
+	if page < 1 {
+		page = 1
+	}
+
+	start := (page - 1) * per
+	end := start + per
+	if start > len(filtered) {
+		start = len(filtered)
+	}
+	if end > len(filtered) {
+		end = len(filtered)
+	}
+
+	pageSlice := filtered[start:end]
+
+	// baseQuery (garder type/gen/per dans les liens)
+	v := url.Values{}
+	if selectedType != "" {
+		v.Set("type", selectedType)
+	}
+	if selectedGen > 0 {
+		v.Set("gen", strconv.Itoa(selectedGen))
+	}
+	v.Set("per", strconv.Itoa(per))
+	baseQuery := v.Encode()
+
+	// pages [1..totalPages]
+	pagesList := make([]int, 0, totalPages)
+	for i := 1; i <= totalPages; i++ {
+		pagesList = append(pagesList, i)
+	}
+
+	// favoris (pour overlay / modale)
+	favs := readFavorites(r)
+
+	data := PageData{
+		Pokedex:       pageSlice,
+		Favorites:     favoritesToSlice(allPokedex, favs),
+		Types:         uniqueTypes(allPokedex),
+		SelectedType:  selectedType,
+		SelectedGen:   selectedGen,
+		Page:          page,
+		PerPage:       per,
+		TotalPages:    totalPages,
+		Pages:         pagesList,
+		HasPrev:       page > 1,
+		HasNext:       page < totalPages,
+		PrevPage:      page - 1,
+		NextPage:      page + 1,
+		BaseQuery:     baseQuery,
+	}
+
+	renderPage(w, "categorie.html", data)
+}
+
+func pokemonHasType(p Struct.ApiData, t string) bool {
+	for _, tp := range p.Types {
+		if strings.EqualFold(tp.Name, t) {
+			return true
+		}
+	}
+	return false
+}
+
+func uniqueTypes(pokedex []Struct.ApiData) []string {
+	seen := map[string]bool{}
+	out := []string{}
+
+	for _, p := range pokedex {
+		for _, tp := range p.Types {
+			name := strings.TrimSpace(tp.Name)
+			if name == "" {
+				continue
+			}
+			key := strings.ToLower(name)
+			if !seen[key] {
+				seen[key] = true
+				out = append(out, name)
+			}
+		}
+	}
+
+	sort.Slice(out, func(i, j int) bool {
+		return strings.ToLower(out[i]) < strings.ToLower(out[j])
+	})
+
+	return out
 }
 
 // AProposHandler : Page à propos
@@ -144,7 +304,7 @@ func AProposHandler(w http.ResponseWriter, r *http.Request) {
 func GetCollectionJS() template.JS {
 	return template.JS(`
     const filterCheckboxes = document.querySelectorAll('.filter-checkbox');
-    const resetBtn = document.getElementById('resetFilters'); // Assure-toi que l'ID est identique dans le HTML
+    const resetBtn = document.getElementById('resetFilters');
 
     function applyFilters() {
         const selectedTypes = Array.from(document.querySelectorAll('.filter-energie .filter-checkbox:checked'))
@@ -158,7 +318,6 @@ func GetCollectionJS() template.JS {
             const cardTypes = card.getAttribute('data-types') ? card.getAttribute('data-types').split(',') : [];
             const cardGen = parseInt(card.getAttribute('data-gen'));
 
-            // Logique ET pour les types, OU pour les générations
             const typeMatch = selectedTypes.length === 0 || selectedTypes.every(t => cardTypes.includes(t));
             const genMatch = selectedGens.length === 0 || selectedGens.includes(cardGen);
 
@@ -166,24 +325,17 @@ func GetCollectionJS() template.JS {
         });
     }
 
-    // Fonction de réinitialisation
     function resetAll() {
-        // 1. Décocher toutes les cases
         filterCheckboxes.forEach(cb => cb.checked = false);
-
-        // 2. Refermer les menus détails (optionnel mais plus propre)
         document.querySelectorAll('details').forEach(det => det.removeAttribute('open'));
-
-        // 3. Relancer le filtrage (selectedTypes sera vide, donc tout s'affichera)
         applyFilters();
     }
 
-    // Écouteurs d'événements
     filterCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
 
     if (resetBtn) {
         resetBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Empêche un éventuel rechargement de page
+            e.preventDefault();
             resetAll();
         });
     }
@@ -238,7 +390,7 @@ func writeFavorites(w http.ResponseWriter, favs map[int]bool) {
 	})
 }
 
-// transforme le set en slice ApiData (utile si tu veux une page Collection = favoris)
+// transforme le set en slice ApiData
 func favoritesToSlice(pokedex []Struct.ApiData, favs map[int]bool) []Struct.ApiData {
 	out := make([]Struct.ApiData, 0)
 	for _, p := range pokedex {
@@ -269,7 +421,6 @@ func RessourceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// trouver le pokémon par PokedexId
 	var found Struct.ApiData
 	ok := false
 	for _, p := range pokedex {
@@ -288,10 +439,10 @@ func RessourceHandler(w http.ResponseWriter, r *http.Request) {
 	favs := readFavorites(r)
 
 	data := PageData{
-		Pokedex:     pokedex,           // pas obligatoire, mais utile si tu veux l'utiliser ailleurs
-		Pokemon:     found,             // IMPORTANT : utilisé dans ressource.html
-		IsFavorite:  favs[found.PokedexId],
-		Favorites:   favoritesToSlice(pokedex, favs),
+		Pokedex:    pokedex,
+		Pokemon:    found,
+		IsFavorite: favs[found.PokedexId],
+		Favorites:  favoritesToSlice(pokedex, favs),
 	}
 
 	renderPage(w, "ressource.html", data)
@@ -327,22 +478,21 @@ func ToggleFavoris(w http.ResponseWriter, r *http.Request) {
 
 	writeFavorites(w, favs)
 
-	// retour à la page détail
 	http.Redirect(w, r, "/ressource?id="+strconv.Itoa(id), http.StatusSeeOther)
 }
 
 // RessourcesHandler : Page des ressources (liste + recherche)
 func RessourcesHandler(w http.ResponseWriter, r *http.Request) {
 	allPokedex := GetPokedex()
-    if len(allPokedex) == 0 {
-        http.Error(w, "API indisponible", http.StatusServiceUnavailable)
-        return
-    }
+	if len(allPokedex) == 0 {
+		http.Error(w, "API indisponible", http.StatusServiceUnavailable)
+		return
+	}
 
-    all := allPokedex
-    if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
-        all = allPokedex[1:]
-    }
+	all := allPokedex
+	if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
+		all = allPokedex[1:]
+	}
 
 	query := strings.ToLower(r.URL.Query().Get("q"))
 	results := all
