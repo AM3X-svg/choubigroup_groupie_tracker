@@ -3,7 +3,7 @@ package structure
 type ApiData struct {
 	PokedexId   int           `json:"pokedex_id"`
 	Generation  int           `json:"generation"`
-	Categorie   string        `json:"categorie"`
+	Category    string        `json:"category"`
 	Name        Name          `json:"name"`
 	Sprites     Sprites       `json:"sprites"`
 	Types       []Types       `json:"types"`

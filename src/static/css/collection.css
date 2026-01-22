@@ -1,19 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Outfit", sans-serif;
+    font-family: "Coda", system-ui;
 }
 
 body {
+    overflow-x: hidden;
     background: #e0e0e0;
-    min-height: 100vh;
-    padding-top: 120px;
+    color: #333;
 }
 
-/* HEADER */
+/* Fix Scroll Lock */
+body:has(.pokemon-card-expand[open]) {
+    overflow: hidden;
+}
+
+/* =========================
+   HEADER
+   ========================= */
 header {
     position: fixed;
     top: 50px;
@@ -25,14 +32,10 @@ header {
     justify-content: space-between;
     align-items: center;
     background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(15px); /* Ajouté pour le style */
     border-radius: 40px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
-
-    /* On s'assure que le header est au premier plan absolu */
-    z-index: 10000;
-    /* SURTOUT PAS d'overflow: hidden ici sinon les menus seront coupés */
+    z-index: 1000; /* ++ pour être sûr qu’il passe au-dessus */
 }
 
 header a {
@@ -42,146 +45,272 @@ header a {
 }
 
 .header svg {
-    stroke: white;
+    stroke: black;
 }
 
-.header-icon svg {
+.header-icon-transparent{
     opacity: 0%;
     stroke: white;
     cursor: pointer;
 }
 
-/* --- Toolbar de Filtres (Horizontale) --- */
-.filter-toolbar {
-    width: 80%;
-    margin: 50px auto 30px auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    padding: 10px 30px;
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+.header-icon svg {
+    stroke: black;
+    cursor: pointer;
+}
 
-    /* Si elle est dans le flux de la page (sous le header) */
+/* =========================
+   FILTRES
+   ========================= */
+.collection-page {
+    padding-top: 190px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+}
+
+.filter-toolbar {
+    background: white;
+    padding: 25px;
+    border-radius: 30px;
+    margin: 0 20px 40px 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
     position: relative;
-    z-index: 9000;
+    z-index: 1000;
+}
+
+.search-bar-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-bar-container input {
+    flex: 1;
+    padding: 14px 25px;
+    border-radius: 15px;
+    border: 2px solid #f0f0f0;
+    background: #f9f9f9;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.search-bar-container input:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.search-bar-container button {
+    padding: 0 25px;
+    border-radius: 15px;
+    border: none;
+    background: #000;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.search-bar-container button:hover {
+    transform: translateY(-2px);
 }
 
 .dropdowns-container {
     display: flex;
-    gap: 20px;
-    flex-grow: 1;
-    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 .filter-dropdown {
     position: relative;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    width: 180px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 200px;
 }
 
 .filter-dropdown summary {
-    padding: 10px 20px;
-    list-style: none;
-    cursor: pointer;
+    padding: 12px 20px;
     font-weight: 600;
-    text-align: center;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
 }
 
-/* Le contenu qui descend au survol/clic */
+/* Design des options dans les menus */
 .dropdown-content {
     position: absolute;
-    top: calc(100% + 10px); /* Un petit espace sous le bouton */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px; /* Un peu plus large que le bouton */
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 15px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    max-height: 400px;
+    top: calc(100% + 5px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    z-index: 2000;
+    max-height: 250px;
     overflow-y: auto;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-
-    /* Indice de priorité maximale */
-    z-index: 10001;
+    padding: 8px;
 }
 
 .dropdown-content label {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.9rem;
+    padding: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    white-space: nowrap;
+    transition: background 0.2s;
+    font-size: 0.9rem;
 }
 
-/* --- Grille des Pokémon --- */
+.dropdown-content label:hover {
+    background: #f0f0f0;
+}
+
+.dropdown-content input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #000;
+}
+
+.filter-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-apply {
+    background: #000;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-reset {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* =========================
+   GRILLE & CARTES
+   ========================= */
 .collection-grid {
-    width: 85%;
-    margin: 40px auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-
-    /* On force la grille à rester derrière tout le reste */
-    position: relative;
-    z-index: 1;
+    padding: 0 20px;
 }
 
-.pokemon-sprite {
-    background: rgba(255, 255, 255, 0.6);
+.card-wrapper {
+    position: relative;
+    /* IMPORTANT: Pas de z-index ici pour laisser la modale s'échapper */
+}
+
+/* Quand le Pokémon est ouvert, on booste le z-index du parent direct */
+.card-wrapper:has(.pokemon-card-expand[open]) {
+    z-index: 3000;
+}
+
+.pokemon-card-expand {
+    background: white;
     border-radius: 25px;
     padding: 20px;
-    text-align: center;
-    transition: 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.3s;
 }
 
-.pokemon-sprite:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+.pokemon-card-expand:not([open]):hover {
+    transform: translateY(-5px);
 }
 
-.img-wrapper img {
-    width: 100%;
-    max-width: 140px;
+.pokemon-card-expand summary {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sprite-img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
 }
 
 .pokemon-name {
-    font-size: 1.1rem;
-    font-weight: 700;
     margin-top: 10px;
-    color: #222;
+    text-transform: capitalize;
 }
 
-.btn-reset {
-    padding: 10px 25px;
+.pokedex-id {
+    font-weight: 800;
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+/* =========================
+   MODALE (ETAT OPEN)
+   ========================= */
+.pokemon-card-expand[open] {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 450px;
+    height: auto;
+    z-index: 3001; /* Au dessus de l'overlay */
+    padding: 40px;
+    border-radius: 35px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+    cursor: default;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2999; /* Juste en dessous de la modale */
+}
+
+.pokemon-card-expand[open] + .modal-overlay {
+    display: block;
+}
+
+/* Contenu détails */
+.card-details-content {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    background: #f9f9f9;
+    padding: 20px;
     border-radius: 20px;
-    border: none;
-    background: #333;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+    margin-bottom: 20px;
 }
 
-.btn-reset:hover { background: #ee1515; }
-
-/* Scrollbar personnalisée pour les menus */
-.dropdown-content::-webkit-scrollbar { width: 5px; }
-.dropdown-content::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.base-stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+}
