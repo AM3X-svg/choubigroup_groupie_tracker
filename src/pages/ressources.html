@@ -30,7 +30,9 @@
 <main class="resources-page">
     <h1>Ressources</h1>
 
-    <!-- (optionnel) recherche -->
+    <!-- Debug (tu peux supprimer après) -->
+    <p>Nombre de pokémons: {{len .Pokedex}}</p>
+
     <section class="search-zone">
         <form method="GET" action="/ressources">
             <input type="text" name="q" placeholder="Rechercher un Pokémon (FR)…" value="{{.Query}}">
@@ -39,7 +41,7 @@
     </section>
 
     <div class="resources-grid">
-        {{range .Pokemons}}
+        {{range .Pokedex}}
         <article class="poke-card">
             <img class="poke-img" src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}">
             <h2 class="poke-name">{{.Name.Fr}}</h2>
@@ -61,7 +63,7 @@
         {{end}}
     </div>
 
-    {{if not .Pokemons}}
+    {{if not .Pokedex}}
     <p>Aucun résultat.</p>
     {{end}}
 </main>
