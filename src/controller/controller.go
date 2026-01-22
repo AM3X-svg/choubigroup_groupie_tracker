@@ -333,11 +333,16 @@ func ToggleFavoris(w http.ResponseWriter, r *http.Request) {
 
 // RessourcesHandler : Page des ressources (liste + recherche)
 func RessourcesHandler(w http.ResponseWriter, r *http.Request) {
-	all := GetPokedex()
-	if len(all) == 0 {
-		http.Error(w, "API indisponible", http.StatusServiceUnavailable)
-		return
-	}
+	allPokedex := GetPokedex()
+    if len(allPokedex) == 0 {
+        http.Error(w, "API indisponible", http.StatusServiceUnavailable)
+        return
+    }
+
+    all := allPokedex
+    if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
+        all = allPokedex[1:]
+    }
 
 	query := strings.ToLower(r.URL.Query().Get("q"))
 	results := all
