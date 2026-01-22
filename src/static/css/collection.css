@@ -13,14 +13,10 @@ body {
     color: #333;
 }
 
-/* Fix Scroll Lock */
 body:has(.pokemon-card-expand[open]) {
     overflow: hidden;
 }
 
-/* =========================
-   HEADER
-   ========================= */
 header {
     position: fixed;
     top: 50px;
@@ -35,7 +31,7 @@ header {
     border-radius: 40px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    z-index: 1000; /* ++ pour être sûr qu’il passe au-dessus */
+    z-index: 1000;
 }
 
 header a {
@@ -59,9 +55,6 @@ header a {
     cursor: pointer;
 }
 
-/* =========================
-   FILTRES
-   ========================= */
 .collection-page {
     padding-top: 190px;
     max-width: 1300px;
@@ -139,7 +132,6 @@ header a {
     cursor: pointer;
 }
 
-/* Design des options dans les menus */
 .dropdown-content {
     position: absolute;
     top: calc(100% + 5px);
@@ -198,9 +190,6 @@ header a {
     font-size: 0.9rem;
 }
 
-/* =========================
-   GRILLE & CARTES
-   ========================= */
 .collection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -210,10 +199,8 @@ header a {
 
 .card-wrapper {
     position: relative;
-    /* IMPORTANT: Pas de z-index ici pour laisser la modale s'échapper */
 }
 
-/* Quand le Pokémon est ouvert, on booste le z-index du parent direct */
 .card-wrapper:has(.pokemon-card-expand[open]) {
     z-index: 3000;
 }
@@ -257,9 +244,6 @@ header a {
     font-size: 1.2rem;
 }
 
-/* =========================
-   MODALE (ETAT OPEN)
-   ========================= */
 .pokemon-card-expand[open] {
     position: fixed;
     top: 50%;
@@ -268,7 +252,7 @@ header a {
     width: 90%;
     max-width: 450px;
     height: auto;
-    z-index: 3001; /* Au dessus de l'overlay */
+    z-index: 3001; 
     padding: 40px;
     border-radius: 35px;
     box-shadow: 0 25px 80px rgba(0,0,0,0.3);
@@ -284,14 +268,13 @@ header a {
     height: 100vh;
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(5px);
-    z-index: 2999; /* Juste en dessous de la modale */
+    z-index: 2999; 
 }
 
 .pokemon-card-expand[open] + .modal-overlay {
     display: block;
 }
 
-/* Contenu détails */
 .card-details-content {
     margin-top: 20px;
     text-align: left;
@@ -313,4 +296,150 @@ header a {
     font-size: 0.85rem;
     font-weight: bold;
     color: #555;
+}
+
+.generic-overlay,
+/* =======================
+   OVERLAY RECHERCHE
+======================= */
+
+#search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5); /* plus sombre pour focus sur la recherche */
+    backdrop-filter: blur(6px);   /* flou derrière */
+    display: none; /* caché par défaut */
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+#toggle-search:checked ~ #search-overlay {
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.search-container {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.search-top-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-top-bar input[type="text"] {
+    flex: 1;
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.2);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-top-bar input[type="text"]:focus {
+    border-color: #2b3cff;
+    box-shadow: 0 0 8px rgba(43,60,255,0.3);
+}
+
+.search-top-bar button {
+    padding: 12px 18px;
+    background: #2b3cff;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-top-bar button:hover {
+    background: #1f2fd9;
+}
+
+.clear-search-btn {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 18px;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+    color: #2b3cff;
+}
+
+#search-overlay p {
+    font-size: 14px;
+    opacity: 0.7;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* animation fade in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+
+#toggle-favs:checked ~ #favs-overlay,
+#toggle-auth:checked ~ #auth-overlay,
+#toggle-search:checked ~ #search-overlay {
+    display: flex;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.close-btn {
+    font-size: 24px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.favs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.clear-search-btn {
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: 700;
 }

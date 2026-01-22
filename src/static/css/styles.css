@@ -18,9 +18,6 @@ body {
     display: flex;
 }
 
-/* =========================
-   HEADER
-   ========================= */
 header {
     position: fixed;
     top: 50px;
@@ -35,7 +32,7 @@ header {
     border-radius: 40px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    z-index: 1000; /* ++ pour être sûr qu’il passe au-dessus */
+    z-index: 1000;
 }
 
 header a {
@@ -48,22 +45,16 @@ header a {
     stroke: black;
 }
 
-.header-icon-transparent{
-    opacity: 0%;
-    stroke: white;
-    cursor: pointer;
-}
-
-.header-icon svg {
+.header-icon-transparent {
     stroke: black;
     cursor: pointer;
 }
 
-/* =========================
-   OVERLAYS
-   ========================= */
+.header-icon{
+    stroke: black;
+    cursor: pointer;
+}
 
-/* --- RECHERCHE OVERLAY (Ton Design Préservé) --- */
 .search-overlay {
     width: 100%;
     height: 100vh;
@@ -148,7 +139,6 @@ header a {
 
 .search-sprites img { width: 100%; height: auto; }
 
-/* --- STYLES MODALES (FAV / AUTH) --- */
 .generic-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -246,28 +236,14 @@ header a {
     font-weight: bold;
 }
 
-/* =========================
-   MAIN / GLOBAL (FIX IMPORTANT)
-   ========================= */
-
-/*
-  AVANT: main était en display:flex + center => ça cassait Ressources/Détails
-  MAINTENANT: main reste "normal" (flow), et on gère page par page.
-*/
 main {
     min-height: 100vh;
 }
 
-/* Espace global sous le header FIXED */
 .resources-page,
 .detail-page {
-    /* header top=50px + padding + marge => on laisse de l’air */
     padding-top: 160px;
 }
-
-/* =========================
-   HERO / HOME (ton design inchangé)
-   ========================= */
 
 .hero-container {
     width: 100%;
@@ -345,10 +321,6 @@ main {
     text-decoration: none;
     border: 1px solid #ccc;
 }
-
-/* =========================
-   CARDS (HOME)
-   ========================= */
 
 .univers-card {
     background: rgba(255, 255, 255, 0.6);
@@ -447,10 +419,6 @@ main {
 #screen-1:checked ~ .univers-slider label:nth-child(1),
 #screen-2:checked ~ .univers-slider label:nth-child(2) { background: white; }
 
-/* =========================
-   PAGE LISTE /ressources
-   ========================= */
-
 .resources-page {
     max-width: 1200px;
     margin: 0 auto;
@@ -504,10 +472,6 @@ main {
     text-decoration: none;
 }
 
-/* =========================
-   PAGE DÉTAIL /ressource
-   ========================= */
-
 .detail-page{
     max-width: 1200px;
     margin: 0 auto;
@@ -535,12 +499,10 @@ main {
     box-shadow: 0 4px 18px rgba(0,0,0,0.08);
 }
 
-/* première carte pleine largeur */
 .detail-page > .detail-card:first-of-type{
     grid-column: 1 / -1;
 }
 
-/* top card layout (image + infos) */
 .detail-top{
     display: grid;
     grid-template-columns: 220px 1fr;
@@ -572,7 +534,6 @@ main {
     cursor: pointer;
 }
 
-/* Stats grid lisible */
 .detail-grid {
     list-style: none;
     padding: 0;

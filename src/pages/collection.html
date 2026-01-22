@@ -131,5 +131,58 @@
         {{end}}
     </section>
 </main>
+
+
+<!-- OVERLAY FAVORIS -->
+<div id="favs-overlay" class="generic-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Favoris</h2>
+            <label for="toggle-favs" class="close-btn">&times;</label>
+        </div>
+
+        <div class="favs-list">
+            {{if .Favorites}}
+            {{range .Favorites}}
+            <a href="/ressource?id={{.PokedexId}}" class="fav-item" style="text-decoration:none; color:inherit;">
+                <img src="{{.Sprites.Regular}}" alt="{{.Name.Fr}}" width="60" height="60" style="object-fit:contain;">
+                <div>
+                    <div style="font-weight:800;">{{.Name.Fr}}</div>
+                    <div style="opacity:.7;">#{{.PokedexId}}</div>
+                </div>
+            </a>
+            {{end}}
+            {{else}}
+            <p>Aucun favori.</p>
+            {{end}}
+        </div>
+    </div>
+</div>
+
+<!-- OVERLAY AUTH (placeholder) -->
+<div id="auth-overlay" class="generic-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>Compte</h2>
+            <label for="toggle-auth" class="close-btn">&times;</label>
+        </div>
+        <p>Coming soon…</p>
+    </div>
+</div>
+
+<!-- OVERLAY SEARCH (placeholder) -->
+<div id="search-overlay" class="search-overlay">
+    <div class="search-container">
+        <div class="search-top-bar">
+            <form method="GET" action="/ressources">
+                <input type="text" name="q" placeholder="Rechercher un Pokémon (FR)..." value="{{.Query}}">
+                <button type="submit">OK</button>
+            </form>
+            <label for="toggle-search" class="clear-search-btn">Fermer</label>
+        </div>
+        <p style="margin-top:10px; opacity:.7;">La recherche complète est sur la page Ressources.</p>
+    </div>
+</div>
+
 </body>
 </html>

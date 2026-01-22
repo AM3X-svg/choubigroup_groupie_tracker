@@ -96,11 +96,13 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	favs := readFavorites(r)
+
 	data := PageData{
 		RandomPokemon: randomPokemon,
 		Pokedex:       results,
 		Query:         query,
-		Favorites:     []Struct.ApiData{},
+		Favorites:     favoritesToSlice(pokedex, favs),
 	}
 
 	renderPage(w, "index.html", data)
@@ -363,7 +365,14 @@ func uniqueTypes(pokedex []Struct.ApiData) []string {
 
 // AProposHandler : Page à propos
 func AProposHandler(w http.ResponseWriter, r *http.Request) {
-	renderPage(w, "aPropos.html", PageData{})
+	allPokedex := GetPokedex()
+	favs := readFavorites(r)
+
+	data := PageData{
+		Favorites: favoritesToSlice(allPokedex, favs),
+	}
+
+	renderPage(w, "aPropos.html", data)
 }
 
 // GetCollectionJS : Retourne le JavaScript de filtrage dynamique
