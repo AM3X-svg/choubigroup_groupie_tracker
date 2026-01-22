@@ -314,12 +314,3 @@ header a {
     font-weight: bold;
     color: #555;
 }
-
-/* =========================
-   RESPONSIVE
-   ========================= */
-@media (max-width: 600px) {
-    header { width: 95%; padding: 15px 20px; }
-    .dropdowns-container { flex-direction: column; }
-    .filter-toolbar { padding: 15px; }
-}
