@@ -48,6 +48,12 @@ header a {
     stroke: black;
 }
 
+.header-icon-transparent{
+    opacity: 0%;
+    stroke: white;
+    cursor: pointer;
+}
+
 .header-icon svg {
     stroke: black;
     cursor: pointer;

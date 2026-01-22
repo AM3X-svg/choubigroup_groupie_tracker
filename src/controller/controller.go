@@ -9,11 +9,10 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
-	"net/url"
-    "strconv"
-
 )
 
 // PageData contient tout ce dont tes templates ont besoin
@@ -25,8 +24,7 @@ type PageData struct {
 	Favorites     []Struct.ApiData // Ajouté pour corriger l'erreur du template index.html
 
 	Pokemon    Struct.ApiData
-    IsFavorite bool
-
+	IsFavorite bool
 }
 
 // renderPage gère l'affichage des fichiers HTML
@@ -99,36 +97,104 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func CollectionHandler(w http.ResponseWriter, r *http.Request) {
 	allPokedex := GetPokedex()
 	if len(allPokedex) == 0 {
-		http.Error(w, "API indisponible", http.StatusServiceUnavailable)
+		http.Error(w, "Données indisponibles", http.StatusInternalServerError)
 		return
 	}
 
-	// EXCLUSION DU PREMIER POKEMON (Index 0)
-	// On ne garde que les pokémons du 2ème au dernier
 	pokedex := allPokedex[1:]
-
+	r.ParseForm()
+	selectedTypes := r.Form["type"]
+	selectedGens := r.Form["gen"]
+	selectedFormes := r.Form["forme"]
 	query := strings.ToLower(r.FormValue("search"))
+
 	var results []Struct.ApiData
 
-	if query != "" {
-		for _, p := range pokedex {
-			if strings.Contains(strings.ToLower(p.Name.Fr), query) {
-				results = append(results, p)
+	for _, p := range pokedex {
+		// --- 1. RECHERCHE TEXTE ---
+		matchSearch := query == "" || strings.Contains(strings.ToLower(p.Name.Fr), query)
+
+		// --- 2. FILTRE GÉNÉRATIONS ---
+		matchGen := len(selectedGens) == 0
+		for _, g := range selectedGens {
+			if fmt.Sprintf("%d", p.Generation) == g {
+				matchGen = true
+				break
 			}
 		}
-	} else {
-		results = pokedex
+
+		// --- 3. FILTRE TYPES (STRICT & EXCLUSIF) ---
+		matchAllTypes := true
+		if len(selectedTypes) > 0 {
+			// Si bitype alors qu'on a coché 1 seul type -> False
+			if len(p.Types) != len(selectedTypes) {
+				matchAllTypes = false
+			} else {
+				for _, sType := range selectedTypes {
+					found := false
+					for _, pType := range p.Types {
+						if pType.Name == sType {
+							found = true
+							break
+						}
+					}
+					if !found {
+						matchAllTypes = false
+						break
+					}
+				}
+			}
+		}
+
+		// --- 4. FILTRE FORMES & SPRITES ---
+		matchForme := len(selectedFormes) == 0
+		displaySprite := p.Sprites.Regular // On stocke le sprite dans une variable locale
+
+		if !matchForme {
+			for _, f := range selectedFormes {
+				if f == "Mega" && len(p.Evolution.Mega) > 0 {
+					matchForme = true
+					if p.Evolution.Mega[0].SpritesMega.Regular != "" {
+						displaySprite = p.Evolution.Mega[0].SpritesMega.Regular
+					}
+				} else if f == "Gmax" && p.Sprites.Gmax.Regular != "" {
+					matchForme = true
+					displaySprite = p.Sprites.Gmax.Regular
+				} else {
+					for _, rf := range p.Formes {
+						if strings.EqualFold(rf.Region, f) {
+							matchForme = true
+							break
+						}
+					}
+				}
+			}
+		}
+
+		// 3. Validation finale
+		if matchSearch && matchGen && matchAllTypes && matchForme {
+			// On crée un nouvel objet pour l'affichage pour ne pas écraser l'original
+			p.Sprites.Regular = displaySprite
+			results = append(results, p)
+		}
 	}
 
-	data := PageData{
-		Pokedex:      results,
-		CollectionJS: GetCollectionJS(),
-		Favorites:    []Struct.ApiData{},
+	data := struct {
+		Pokedex []Struct.ApiData
+		Query   string
+		Types   []string
+		Gens    []string
+		Formes  []string
+	}{
+		Pokedex: results,
+		Query:   query,
+		Types:   selectedTypes,
+		Gens:    selectedGens,
+		Formes:  selectedFormes,
 	}
 
 	renderPage(w, "collection.html", data)
 }
-
 
 // CategorieHandler : Page des catégories
 func CategorieHandler(w http.ResponseWriter, r *http.Request) {
@@ -288,10 +354,10 @@ func RessourceHandler(w http.ResponseWriter, r *http.Request) {
 	favs := readFavorites(r)
 
 	data := PageData{
-		Pokedex:     pokedex,           // pas obligatoire, mais utile si tu veux l'utiliser ailleurs
-		Pokemon:     found,             // IMPORTANT : utilisé dans ressource.html
-		IsFavorite:  favs[found.PokedexId],
-		Favorites:   favoritesToSlice(pokedex, favs),
+		Pokedex:    pokedex, // pas obligatoire, mais utile si tu veux l'utiliser ailleurs
+		Pokemon:    found,   // IMPORTANT : utilisé dans ressource.html
+		IsFavorite: favs[found.PokedexId],
+		Favorites:  favoritesToSlice(pokedex, favs),
 	}
 
 	renderPage(w, "ressource.html", data)
@@ -334,15 +400,15 @@ func ToggleFavoris(w http.ResponseWriter, r *http.Request) {
 // RessourcesHandler : Page des ressources (liste + recherche)
 func RessourcesHandler(w http.ResponseWriter, r *http.Request) {
 	allPokedex := GetPokedex()
-    if len(allPokedex) == 0 {
-        http.Error(w, "API indisponible", http.StatusServiceUnavailable)
-        return
-    }
+	if len(allPokedex) == 0 {
+		http.Error(w, "API indisponible", http.StatusServiceUnavailable)
+		return
+	}
 
-    all := allPokedex
-    if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
-        all = allPokedex[1:]
-    }
+	all := allPokedex
+	if len(allPokedex) > 0 && allPokedex[0].PokedexId == 0 {
+		all = allPokedex[1:]
+	}
 
 	query := strings.ToLower(r.URL.Query().Get("q"))
 	results := all

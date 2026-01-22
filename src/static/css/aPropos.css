@@ -22,14 +22,10 @@ header {
     justify-content: space-between;
     align-items: center;
     background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(15px); /* Ajouté pour le style */
     border-radius: 40px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
-
-    /* On s'assure que le header est au premier plan absolu */
-    z-index: 10000;
-    /* SURTOUT PAS d'overflow: hidden ici sinon les menus seront coupés */
+    z-index: 1000; /* ++ pour être sûr qu’il passe au-dessus */
 }
 
 header a {
@@ -42,8 +38,13 @@ header a {
     stroke: black;
 }
 
-.header-icon svg {
+.header-icon-transparent{
     opacity: 0%;
+    stroke: white;
+    cursor: pointer;
+}
+
+.header-icon svg {
     stroke: black;
     cursor: pointer;
 }
