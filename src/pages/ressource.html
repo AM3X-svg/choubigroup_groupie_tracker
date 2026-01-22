@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Pokemon.Name.Fr}} • Détails</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+
+<input type="checkbox" id="toggle-search" class="search-state-checkbox" style="display:none;">
+
+<header class="header">
+    <a href="/index">Accueil</a>
+    <a href="/collection">Collection</a>
+    <a href="/ressources">Ressources</a>
+    <a href="/categorie">Catégorie</a>
+    <a href="/aPropos">A-Propos</a>
+
+    <a href="/collection" class="header-icon" title="Favoris">
+        <img src="/static/icon/heart.svg" alt="Favoris" width="40" height="40">
+    </a>
+
+    <label for="toggle-search" class="header-icon" style="cursor:pointer;" title="Recherche">
+        <img src="/static/icon/search.svg" alt="Recherche" width="40" height="40">
+    </label>
+</header>
+
+<main class="detail-page">
+    <a class="backlink" href="/ressources">← Retour</a>
+
+    <section class="detail-card">
+        <div class="detail-top">
+            <img class="detail-img" src="{{.Pokemon.Sprites.Regular}}" alt="{{.Pokemon.Name.Fr}}">
+
+            <div class="detail-info">
+                <h1>{{.Pokemon.Name.Fr}}</h1>
+                <p><strong>ID :</strong> #{{.Pokemon.PokedexId}}</p>
+                <p><strong>Génération :</strong> {{.Pokemon.Generation}}</p>
+                <p><strong>Catégorie :</strong> {{.Pokemon.Categorie}}</p>
+
+                <div class="types">
+                    {{range .Pokemon.Types}}
+                    <span class="type">
+              {{if .Image}}<img src="{{.Image}}" alt="{{.Name}}" width="18" height="18" style="vertical-align:middle;">{{end}}
+              {{.Name}}
+            </span>
+                    {{end}}
+                </div>
+
+                <form method="POST" action="/favoris/toggle">
+                    <input type="hidden" name="id" value="{{.Pokemon.PokedexId}}">
+                    <button class="fav-btn" type="submit">
+                        {{if .IsFavorite}}❤️ Retirer des favoris{{else}}🤍 Ajouter aux favoris{{end}}
+                    </button>
+                </form>
+
+                <div style="margin-top:10px;">
+                    <p><strong>Taille :</strong> {{.Pokemon.Height}}</p>
+                    <p><strong>Poids :</strong> {{.Pokemon.Weight}}</p>
+                    <p><strong>Taux capture :</strong> {{.Pokemon.CatchRate}}</p>
+                    <p><strong>Niveau 100 :</strong> {{.Pokemon.Level100}}</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="detail-card">
+        <h2>Sprites</h2>
+        <div class="sprites-row">
+            <div>
+                <p>Regular</p>
+                <img class="mini-sprite" src="{{.Pokemon.Sprites.Regular}}" alt="Regular">
+            </div>
+            <div>
+                <p>Shiny</p>
+                <img class="mini-sprite" src="{{.Pokemon.Sprites.Shiny}}" alt="Shiny">
+            </div>
+            {{if .Pokemon.Sprites.Gmax.Regular}}
+            <div>
+                <p>Gmax</p>
+                <img class="mini-sprite" src="{{.Pokemon.Sprites.Gmax.Regular}}" alt="Gmax">
+            </div>
+            {{end}}
+        </div>
+    </section>
+
+    <section class="detail-card">
+        <h2>Talents</h2>
+        <ul>
+            {{range .Pokemon.Talents}}
+            <li>{{.Name}} {{if .Tc}}(Talent caché){{end}}</li>
+            {{end}}
+        </ul>
+    </section>
+
+    <section class="detail-card">
+        <h2>Stats</h2>
+        <ul class="detail-grid">
+            <li><strong>HP</strong><span>{{.Pokemon.Stats.Hp}}</span></li>
+            <li><strong>ATK</strong><span>{{.Pokemon.Stats.Atk}}</span></li>
+            <li><strong>DEF</strong><span>{{.Pokemon.Stats.Def}}</span></li>
+            <li><strong>SP. ATK</strong><span>{{.Pokemon.Stats.SpeAtk}}</span></li>
+            <li><strong>SP. DEF</strong><span>{{.Pokemon.Stats.SpeDef}}</span></li>
+            <li><strong>VIT</strong><span>{{.Pokemon.Stats.Vit}}</span></li>
+        </ul>
+    </section>
+
+    <section class="detail-card">
+        <h2>Résistances</h2>
+        <ul>
+            {{range .Pokemon.Resistances}}
+            <li>{{.Name}} : x{{.Multiplier}}</li>
+            {{end}}
+        </ul>
+    </section>
+
+    <section class="detail-card">
+        <h2>Évolutions</h2>
+
+        <h3>Pré-évolutions</h3>
+        {{if .Pokemon.Evolution.Pre}}
+        <ul>
+            {{range .Pokemon.Evolution.Pre}}
+            <li>#{{.PokedexId}} - {{.Name}} ({{.Condition}})</li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>Aucune</p>
+        {{end}}
+
+        <h3>Évolutions suivantes</h3>
+        {{if .Pokemon.Evolution.Next}}
+        <ul>
+            {{range .Pokemon.Evolution.Next}}
+            <li>#{{.PokedexId}} - {{.Name}} ({{.Condition}})</li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>Aucune</p>
+        {{end}}
+
+        <h3>Méga</h3>
+        {{if .Pokemon.Evolution.Mega}}
+        <ul>
+            {{range .Pokemon.Evolution.Mega}}
+            <li>
+                Orbe : {{.Orbe}}
+                <div class="sprites-row" style="margin-top:8px;">
+                    <img class="mini-sprite" src="{{.SpritesMega.Regular}}" alt="Mega Regular">
+                    <img class="mini-sprite" src="{{.SpritesMega.Shiny}}" alt="Mega Shiny">
+                </div>
+            </li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>Aucune</p>
+        {{end}}
+    </section>
+
+    <section class="detail-card">
+        <h2>Groupes d’œufs</h2>
+        <p>
+            {{range $i, $g := .Pokemon.EggGroups}}
+            {{if $i}}, {{end}}{{$g}}
+            {{end}}
+        </p>
+    </section>
+
+    <section class="detail-card">
+        <h2>Sexe</h2>
+        <p><strong>Mâle :</strong> {{.Pokemon.Sexe.Male}}%</p>
+        <p><strong>Femelle :</strong> {{.Pokemon.Sexe.Female}}%</p>
+    </section>
+
+    <section class="detail-card">
+        <h2>Formes</h2>
+        {{if .Pokemon.Formes}}
+        <ul>
+            {{range .Pokemon.Formes}}
+            <li>{{.Region}} - {{.Name.Fr}}</li>
+            {{end}}
+        </ul>
+        {{else}}
+        <p>Aucune</p>
+        {{end}}
+    </section>
+
+</main>
+
+</body>
+</html>
