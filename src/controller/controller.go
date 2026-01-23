@@ -375,48 +375,6 @@ func AProposHandler(w http.ResponseWriter, r *http.Request) {
 	renderPage(w, "aPropos.html", data)
 }
 
-// GetCollectionJS : Retourne le JavaScript de filtrage dynamique
-func GetCollectionJS() template.JS {
-	return template.JS(`
-    const filterCheckboxes = document.querySelectorAll('.filter-checkbox');
-    const resetBtn = document.getElementById('resetFilters');
-
-    function applyFilters() {
-        const selectedTypes = Array.from(document.querySelectorAll('.filter-energie .filter-checkbox:checked'))
-            .map(cb => cb.value);
-        const selectedGens = Array.from(document.querySelectorAll('.filter-gen .filter-checkbox:checked'))
-            .map(cb => parseInt(cb.value));
-
-        const cards = document.querySelectorAll('.pokemon-sprite');
-
-        cards.forEach(card => {
-            const cardTypes = card.getAttribute('data-types') ? card.getAttribute('data-types').split(',') : [];
-            const cardGen = parseInt(card.getAttribute('data-gen'));
-
-            const typeMatch = selectedTypes.length === 0 || selectedTypes.every(t => cardTypes.includes(t));
-            const genMatch = selectedGens.length === 0 || selectedGens.includes(cardGen);
-
-            card.style.display = (typeMatch && genMatch) ? 'block' : 'none';
-        });
-    }
-
-    function resetAll() {
-        filterCheckboxes.forEach(cb => cb.checked = false);
-        document.querySelectorAll('details').forEach(det => det.removeAttribute('open'));
-        applyFilters();
-    }
-
-    filterCheckboxes.forEach(cb => cb.addEventListener('change', applyFilters));
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            resetAll();
-        });
-    }
-    `)
-}
-
 /* =========================
    FAVORIS (cookies) + RESSOURCES
 ========================= */
